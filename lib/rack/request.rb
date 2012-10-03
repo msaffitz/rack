@@ -196,26 +196,32 @@ module Rack
     # This method support both application/x-www-form-urlencoded and
     # multipart/form-data.
     def POST
+      logger.warn "***** IN POST, rack.input #{@env["rack.input"]}"
       if @env["rack.input"].nil?
         raise "Missing rack.input"
       elsif @env["rack.request.form_input"].eql? @env["rack.input"]
+        logger.warn "***** IN POST, rrfi == ri, return #{@env["rack.request.form_hash"]}"
         @env["rack.request.form_hash"]
       elsif form_data? || parseable_data?
+        logger.warn "***** IN POST, fd: #{form_data?} pd: #{parseable_data?}"
         @env["rack.request.form_input"] = @env["rack.input"]
         unless @env["rack.request.form_hash"] = parse_multipart(env)
           form_vars = @env["rack.input"].read
-
+          logger.warn "***** IN POST, fv1 return #{@env["rack.request.form_hash"]}"
           # Fix for Safari Ajax postings that always append \0
           # form_vars.sub!(/\0\z/, '') # performance replacement:
           form_vars.slice!(-1) if form_vars[-1] == ?\0
 
           @env["rack.request.form_vars"] = form_vars
+          logger.warn "***** IN POST, fv2 #{form_vars}"
           @env["rack.request.form_hash"] = parse_query(form_vars)
 
           @env["rack.input"].rewind
         end
+        logger.warn "***** IN POST, fh return #{@env["rack.request.form_hash"]}"
         @env["rack.request.form_hash"]
       else
+        logger.warn "***** IN POST, else {}"
         {}
       end
     end
