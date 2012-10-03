@@ -18,6 +18,7 @@ module Rack
     attr_reader :env
 
     def initialize(env)
+      logger.warn "***** INIT RACK REQUEST #{env.to_s}"
       @env = env
     end
 
@@ -179,9 +180,12 @@ module Rack
 
     # Returns the data received in the query string.
     def GET
+      logger.warn "***** IN GET, QUERY STRING IS #{query_string}"
       if @env["rack.request.query_string"] == query_string
+        logger.warn "***** IN GET RETURNING QUERY HASH"
         @env["rack.request.query_hash"]
       else
+        logger.warn "***** IN GET CREATING QUERY HASH, #{parse_query(query_string)}"
         @env["rack.request.query_string"] = query_string
         @env["rack.request.query_hash"]   = parse_query(query_string)
       end
@@ -220,6 +224,7 @@ module Rack
     #
     # Note that modifications will not be persisted in the env. Use update_param or delete_param if you want to destructively modify params.
     def params
+      logger.warn "***** IN PARAMS #{self.POST.to_s}"
       @params ||= self.GET.merge(self.POST)
     rescue EOFError
       self.GET.dup
