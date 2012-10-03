@@ -18,8 +18,8 @@ module Rack
     attr_reader :env
 
     def initialize(env)
-      logger.warn "***** INIT RACK REQUEST #{env.to_s}"
       @env = env
+      logger.warn "***** INIT RACK REQUEST #{env.to_s}"
     end
 
     def body;            @env["rack.input"]                       end
